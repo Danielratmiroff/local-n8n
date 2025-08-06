@@ -896,20 +896,7 @@
       "typeVersion": 3
     }
   ],
-  "pinData": {
-    "Execute Workflow Trigger": [
-      {
-        "json": {
-          "createdAt": "2025-08-06T15:19:42.385Z",
-          "updatedAt": "2025-08-06T19:05:29.000Z",
-          "id": "hvD1QpXVHbBdSz1b",
-          "name": "n8n_workflows_backup",
-          "active": true,
-          "isArchived": false
-        }
-      }
-    ]
-  },
+  "pinData": {},
   "repo_name": "local-n8n",
   "repo_owner": "Danielratmiroff",
   "repo_path": "workflows",
@@ -930,6 +917,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2025-08-06T19:14:57.000Z",
-  "versionId": "597c041f-92c3-4446-8c4b-de5d9eb7e365"
+  "updatedAt": "2025-08-06T19:15:19.000Z",
+  "versionId": "51ebffea-63dc-43f5-98b6-347a11fbc942"
 }
