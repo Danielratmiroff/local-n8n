@@ -1,0 +1,97 @@
+version: "3.8"
+
+services:
+  n8n:
+    image: n8nio/n8n
+    container_name: n8n
+    restart: unless-stopped
+    environment:
+      - N8N_HOST=${N8N_HOST}
+      - N8N_PROTOCOL=https
+      - N8N_PORT=5678
+      - WEBHOOK_URL=https://${N8N_HOST}
+      - N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE=true
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - workflows_repo:/workflows
+    networks:
+      - n8n-network
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+    networks:
+      - n8n-network
+
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    restart: unless-stopped
+    ports:
+      - "11435:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - n8n-network
+
+  gitlab-mcp:
+    image: iwakitakuma/gitlab-mcp
+    container_name: gitlab-mcp
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    environment:
+      - GITLAB_PERSONAL_ACCESS_TOKEN=${GITLAB_PERSONAL_ACCESS_TOKEN}
+      - GITLAB_API_URL=${GITLAB_API_URL}
+      - GITLAB_READ_ONLY_MODE=true
+      - USE_GITLAB_WIKI=true
+      - USE_MILESTONE=true
+      - USE_PIPELINE=true
+      - STREAMABLE_HTTP=true
+    ports:
+      - "3333:3002"
+    networks:
+      - n8n-network
+
+  git-sync:
+    image: registry.k8s.io/git-sync/git-sync:v4.0.0
+    container_name: git-sync
+    restart: unless-stopped
+    env_file:
+      - git-sync.env
+    volumes:
+      - workflows_repo:/git
+      - ${SSH_PRIVATE_KEY_PATH}:/etc/git-secret/ssh:ro
+    networks:
+      - n8n-network
+
+  workflow-exporter:
+    image: n8nio/n8n
+    container_name: workflow-exporter
+    restart: unless-stopped
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - workflows_repo:/workflows
+    entrypoint: /bin/sh -c
+    command: |
+      while true; do
+        echo "[workflow-exporter] Exporting workflows…";
+        n8n export:workflow --all --separate --output=/workflows && \
+        echo "[workflow-exporter] Completed at $(date -u '+%Y-%m-%d %H:%M:%SZ')";
+        sleep ${EXPORT_INTERVAL:-1800};
+      done
+    networks:
+      - n8n-network
+
+networks:
+  n8n-network:
+    name: n8n-network
+
+volumes:
+  n8n_data:
+  ollama_data:
+  workflows_repo:
