@@ -1,0 +1,532 @@
+{
+  "active": false,
+  "connections": {
+    "Slack Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send message and wait for response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message and wait for response": {
+      "main": [
+        [
+          {
+            "node": "If user approves",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Accept": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If user approves": {
+      "main": [
+        [
+          {
+            "node": "Accept",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Deny",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client2": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2025-08-07T15:58:53.490Z",
+  "id": "0mNxf2KHTuOgOswv",
+  "isArchived": false,
+  "meta": null,
+  "name": "Bycs_release_agent",
+  "nodes": [
+    {
+      "parameters": {
+        "trigger": [
+          "app_mention"
+        ],
+        "channelId": {
+          "__rl": true,
+          "value": "C099A438EFM",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.slackTrigger",
+      "typeVersion": 1,
+      "position": [
+        384,
+        832
+      ],
+      "id": "4f82d6b4-a17b-42b4-863b-00d74cef610b",
+      "name": "Slack Trigger",
+      "webhookId": "cf7a760e-280d-4a3b-9bdd-eb02d63ae846",
+      "credentials": {
+        "slackApi": {
+          "id": "eBTzZmMuPBrS0vNt",
+          "name": "ByCS Gitlab Slack API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "   You are a Release Agent\n\n    You are a helpful assistant that manages deployments for our desktop application.\n    You work diligently to ensure safe and successful deployments by following best practices\n    and proper deployment procedures.\n\n    You are responsible for the following:\n    - Understanding the user's request and requirements\n    - Deploying the desktop application to the correct environment (eg: integration, preproduction, staging or production)\n    - Determining the correct tag/version/docker image to deploy (eg: 1.0.0, 1.0.1, etc.)\n\n    You can use tools like deploy_desktop_app to manage deployments.\n    For sensitive deployments, use request_approval to get human verification.\n\n    Always think about what to do first, like:\n    - Check current deployment status\n    - Verify the deployment tag exists\n    - Request approval if needed\n    - Monitor deployment progress"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        688,
+        704
+      ],
+      "id": "ecf200a3-5182-4178-ba48-aa4981c7a416",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "qwen3:8b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        656,
+        912
+      ],
+      "id": "b4170e1b-ebf4-4737-9639-1655bd1ca2f9",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "Bl3MEkxA4pHFnvyL",
+          "name": "Local Ollama"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "sendAndWait",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C099A438EFM",
+          "mode": "id"
+        },
+        "message": "Do you like me",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        1120,
+        704
+      ],
+      "id": "d56258e3-de78-4093-a01e-1c4c75000e72",
+      "name": "Send message and wait for response",
+      "webhookId": "333012e0-acc6-4132-8bd6-45aebec04a19",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "RklUSQ4nWtuBUYsD",
+          "name": "ByCS Gitlab Slack"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C097V3Q3W02",
+          "mode": "list",
+          "cachedResultName": "all-automations"
+        },
+        "text": "Sad!!",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        1600,
+        848
+      ],
+      "id": "2cdce136-00a3-4191-8f80-ad8a17b05c08",
+      "name": "Deny",
+      "webhookId": "23f879af-0eda-49cf-bd40-ff2ce58a305a",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "RklUSQ4nWtuBUYsD",
+          "name": "ByCS Gitlab Slack"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C097V3Q3W02",
+          "mode": "list",
+          "cachedResultName": "all-automations"
+        },
+        "text": "Nice!!",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        1600,
+        592
+      ],
+      "id": "59e1aff5-0eaf-4b58-9539-06239f102b2e",
+      "name": "Accept",
+      "webhookId": "23f879af-0eda-49cf-bd40-ff2ce58a305a",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "RklUSQ4nWtuBUYsD",
+          "name": "ByCS Gitlab Slack"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "109d16b4-5bdf-4695-9c99-9dd5ffc9ba0f",
+              "leftValue": "={{ $json.data.approved }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1360,
+        704
+      ],
+      "id": "1fbac545-1829-4268-a7b2-b26c192e9bee",
+      "name": "If user approves"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        1840,
+        592
+      ],
+      "id": "ddb8eb3c-1b1f-4337-abad-22f46a67dd90",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "model": "qwen3:8b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        1856,
+        432
+      ],
+      "id": "ea25b435-170f-4bc0-951c-4ebcb9c2698a",
+      "name": "Ollama Chat Model1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "Bl3MEkxA4pHFnvyL",
+          "name": "Local Ollama"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "endpointUrl": "https://server.smithery.ai/@harshmaur/gitlab-mcp/mcp?api_key=a77a4304-670d-4113-ac32-2ec375c1e223&profile=ashamed-peacock-M8dosc",
+        "serverTransport": "httpStreamable",
+        "include": "selected"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.1,
+      "position": [
+        2160,
+        768
+      ],
+      "id": "3a0c345e-2a44-4be9-be35-c7d7d6055662",
+      "name": "MCP Client"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-mcp.mcpClientTool",
+      "typeVersion": 1,
+      "position": [
+        2000,
+        800
+      ],
+      "id": "a9ff612b-f807-4274-9f08-f684c1884124",
+      "name": "MCP Client1"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Always check for you available tools and pick the most appropiate to execute the request submitted by the user"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        576,
+        16
+      ],
+      "id": "6078dfeb-1547-40ec-8325-baec031c1edf",
+      "name": "AI Agent2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        336,
+        16
+      ],
+      "id": "d639ab9b-7b8c-4d9f-bc47-875cd10b5994",
+      "name": "When chat message received",
+      "webhookId": "34c98e01-5275-4684-b19d-7a40c1b81525"
+    },
+    {
+      "parameters": {
+        "content": "# Test tools with Chat"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "bf68b05f-c5e8-4140-b1ad-27a663d1b4c9",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        432,
+        224
+      ],
+      "id": "7c752045-4385-4dad-91f4-5fff47b4bc21",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "9LoAoIrmQhor11bq",
+          "name": "Daniel Gemini API"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        384,
+        624
+      ],
+      "id": "49f9e3a0-938e-433a-9fcb-3c0d772afacf",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "path": "b05ce95c-f450-4ee7-951b-3960807cfbe0"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "typeVersion": 2,
+      "position": [
+        -736,
+        176
+      ],
+      "id": "b098ad4f-ecf1-4352-bb1b-b6b7c3b293f0",
+      "name": "MCP Server Trigger",
+      "webhookId": "b05ce95c-f450-4ee7-951b-3960807cfbe0"
+    },
+    {
+      "parameters": {
+        "endpointUrl": "https://n8n.mynuve.top/mcp/b05ce95c-f450-4ee7-951b-3960807cfbe0",
+        "serverTransport": "httpStreamable"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.1,
+      "position": [
+        848,
+        240
+      ],
+      "id": "8f9f5265-6021-4290-9d00-ab9dbad02dc5",
+      "name": "MCP Client2"
+    }
+  ],
+  "pinData": {
+    "When clicking ‘Execute workflow’": [
+      {
+        "json": {
+          "text": "can you deploy desktop builds to integration"
+        }
+      }
+    ]
+  },
+  "repo_name": "local-n8n",
+  "repo_owner": "Danielratmiroff",
+  "repo_path": "workflows",
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2025-08-07T16:01:35.388Z",
+      "updatedAt": "2025-08-07T16:01:35.388Z",
+      "id": "ChrohlgOUFPyoE2Q",
+      "name": "Sdui"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2025-08-07T16:33:04.000Z",
+  "versionId": "a96481d0-5e51-4909-aac5-2c694eb3cb80"
+}
